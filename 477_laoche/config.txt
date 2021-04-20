@@ -1,0 +1,146 @@
+
+agv:
+    size_x          float  0.9
+    size_y          float  0.6
+
+network:
+    local_port      int     12345
+    agv_id          int     1
+    num_threads     int     20
+
+carto:
+    config_files_dir    string  "/home/nvidia/carto_config"
+    config_file_name    string  "mapping_imu.lua"
+    radar_scan_time     float   0.02      #雷达扫描一次用的时间
+    pose_matching_score float   0.95        #cartographer返回位姿的可信度
+    paint_map_period_us long    2000000     #更新地图的时间间隔
+ skip_odometer_data  int     10
+
+map:
+    occupied_threshold          float   0.6
+    landmark_map_resolution     float   0.01    #反射板地图分辨率0.01->0.1
+    landmark_map_binarilize_threshold float   0.8
+    landmark_radar_data_accumulated     int 10  #略过一部分反射板数据
+	
+
+odom:    #unused
+    expolate_threshold_us   long    500000      #两帧传感器数据的最大间隔时间
+    expolate_imu_threshold_us   long    250000  #两帧imu数据的最大间隔时间
+    data_interna_threshold_us   long    30000000    #相邻传感器数据间的最大间隔时间
+    reverse_wheel_sensor        bool    0
+    
+	encoder_per_round	float		89947
+	wheel_diameter		float		144
+	wheel_distance		float		500.0
+
+
+device:
+    odom_dev_name    string  "/dev/agv_odom"
+    odom_baudrate   int     115200
+    move_dev_name   string  "/dev/agv_wheel"
+    move_baudrate   int     9600
+    nav_dev_name    string  "/dev/agv_nav"
+    nav_baudrate   int     9600
+imu:
+    dev_name	string	"/dev/agv_imu"
+
+
+radar:
+    intensity_threshold     float   0.9     #反射强度大于此的标为反光板
+    radar_position_x        float   0.41
+    radar_position_y        float   0
+    radar_position_theta    float   0       #未使用
+    point_number            int     541
+    first_point_index       int     60
+    last_point_index        int     480
+	
+	collision_distance_level1x	float	0.4
+	collision_distance_level1y	float	0.3
+	collision_distance_level2x	float	0.7
+	collision_distance_level2y	float	0.4
+	collision_distance_level3x	float	1.0
+	collision_distance_level3y	float	0.4
+	collision_threshold		int 	2
+	
+#	-y----0-----y	
+#	-	-	-	-	|
+#	'			'	x
+#	'			'	|
+#	|-----O-----|	|
+#	|	 AGV	|
+#	|			|
+
+
+scan_matching:
+    occupied_space_cost_factor      float   1   #地图匹配的损失权重
+    translation_delta_cost_factor   float   10  #位姿移动的损失权重
+    rotation_delta_cost_factor      float   10  #位姿旋转的损失权重
+    max_num_iterations              int     10  #单次优化最大迭代次数
+    num_threads                     int     2
+    min_distance        float   0               #过近/过远的点不参与scan matching
+    max_distance        float   19
+#匹配反射板地图时的参数
+landmark_scan_matching:
+    point_rate              float   0.02        #反光板的点比例达到一定程度后启动反光板匹配
+
+    min_distance        float   0
+    max_distance        float   5
+    occupied_space_cost_factor    float   1
+    translation_delta_cost_factor float   10
+    rotation_delta_cost_factor    float   10
+    max_num_iterations     int     10  
+    num_threads                     int     2
+
+    multi_landmark_detect   int    3        #检测到多个反光板直接使用反光板进行定位
+    landmark_detect_range   int     5       #连续的高反射率点会被当成反光板
+	
+
+global_locating:
+    grid_resolution     float   0.5
+    particles_per_grid  int     5 #5->2
+    rotation_sample_count  int     9 #8->10
+    rotation_speed      int     -100  #全局定位时旋转的速度
+    rotation_time_s     int     77   #全局定位时旋转的时间
+    rotation_message_frequency_us   long    1000000  #发送旋转指令的时间间隔
+    simulate_radar_data_size    int     600 #模拟点云数据中点的个数
+    simulate_radar_range        float   19   #模拟点云扫描的距离范围
+
+    occupied_space_cost_factor    float   1
+    translation_delta_cost_factor float   5
+    rotation_delta_cost_factor    float   10
+    max_num_iterations     int     5
+    num_threads         int     2
+    min_distance        float   0
+    max_distance        float   5
+    
+    iterations_count        int     10  #全局定位执行的轮数 #unused
+    remove_unreachable_particles    bool    1    #每轮迭代时移除落在墙里的粒子
+    dbscan_min_point_num    int     4   #unused
+    dbscan_epsilon          float   0.5   #unused
+#	wheel_diameter		int		180
+#	wheel_distance		int		600
+	
+	encoder_per_round	float		200000
+	wheel_diameter		float		180
+	wheel_distance		float		600.0
+
+motecarlo:
+    particle_num        int     2048    #unused
+    variance_x          float   0.5     #unused
+    variance_y          float   0.5     #unused
+    variance_theta      float   1.0     #unused
+    min_particle_num    int     2048     #粒子数小于此值时重采样#unused
+    landmark_point_rate float   0.02    #反光板的点比例达到一定程度后启动反光板匹配
+    landmark_weight     float   0.5
+    random_sample_num   int     1024     #重采样时加入的随机粒子数#unused
+    min_score           float   0.2     #删除得分小于此值的粒子#unused
+    result_grid_size    float   0.05    #unused
+
+corner_detect:
+    threshold_value  int 130
+    block_size       int 3     #领域尺寸
+    ksize           int 3     #口径尺寸
+    k_harris        float 0.04 #Harris 参数
+
+distance_map:
+    range       int     5
